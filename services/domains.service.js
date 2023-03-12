@@ -389,8 +389,7 @@ module.exports = {
             },
             permissions: ['domains.sync'],
             async handler(ctx) {
-
-                return this.scrapeAgents(ctx, 'v1.ddns.agent.sync')
+                return this.scrapeAgents(ctx, 'v1.ddns.agent.sync').filter((item) => item.status == 'fulfilled')
             }
         },
         maps: {
@@ -400,8 +399,7 @@ module.exports = {
             },
             permissions: ['domains.maps'],
             async handler(ctx) {
-
-                return this.scrapeAgents(ctx, 'v1.ddns.agent.maps')
+                return this.scrapeAgents(ctx, 'v1.ddns.agent.maps').filter((item) => item.status == 'fulfilled')
             }
         },
         stats: {
@@ -411,7 +409,7 @@ module.exports = {
             },
             permissions: ['domains.stats'],
             async handler(ctx) {
-                return this.scrapeAgents(ctx, 'v1.ddns.agent.stats')
+                return this.scrapeAgents(ctx, 'v1.ddns.agent.stats').filter((item) => item.status == 'fulfilled')
             }
         },
     },
@@ -420,7 +418,7 @@ module.exports = {
      * Events
      */
     events: {
-        
+
     },
 
     /**
