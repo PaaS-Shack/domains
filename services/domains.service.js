@@ -380,8 +380,6 @@ module.exports = {
                 return record
             }
         },
-
-
         sync: {
             rest: "GET /sync",
             params: {
