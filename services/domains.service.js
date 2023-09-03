@@ -102,6 +102,8 @@ module.exports = {
                     }
                 }
             },
+            //domain dnssec public private keys
+
 
 
             ...Membership.FIELDS,
@@ -177,6 +179,75 @@ module.exports = {
         remove: {
             needEntity: true,
             permissions: ['domains.remove']
+        },
+
+        //service action to create dnssec key pair
+        createKeyPair: {
+            params: {
+                domain: { type: "string", optional: false },
+                keyType: {
+                    type: "enum",
+                    values: ["KSK", "ZSK"],
+                    optional: false
+                },
+                keySize: {
+                    type: "enum",
+                    values: [1024, 2048, 4096],
+                    optional: false
+                },
+                keyTTL: { type: "number", optional: false },
+                keyFlags: {
+                    type: "number",
+                    default: 257,
+                    optional: false
+                },
+                keyProtocol: {
+                    type: "number",
+                    default: 3,
+                    optional: false
+                },
+                keyAlgorithm: {
+                    type: "enum",
+                    values: [
+                        "RSAMD5",
+                        "DH",
+                        "DSA",
+                        "ECC",
+                        "RSASHA1",
+                        "DSANSEC3SHA1",
+                        "RSASHA1NSEC3SHA1",
+                        "RSASHA256",
+                        "RSASHA512",
+                        "ECCGOST",
+                        "ECDSAP256SHA256",
+                        "ECDSAP384SHA384",
+
+                    ],
+                    optional: false
+                },
+                async handler(ctx) {
+                    const params = Object.assign({}, ctx.params);
+
+                    const parsed = psl.parse(params.domain.replace('*.', '').replace('_', ''));
+
+                    const domain = await this.findEntity(ctx, {
+                        query: {
+                            domain: parsed.domain
+                        }
+                    });
+
+                    return await ctx.call('v1.dnssec.createKeyPair', {
+                        domain: domain.id,
+                        keyType: params.keyType,
+                        keySize: params.keySize,
+                        keyTTL: params.keyTTL,
+                        keyFlags: params.keyFlags,
+                        keyProtocol: params.keyProtocol,
+                        keyAlgorithm: params.keyAlgorithm,
+                    })
+                }
+            }
+
         },
 
         domainExists: {
@@ -387,7 +458,7 @@ module.exports = {
             },
             permissions: ['domains.sync'],
             async handler(ctx) {
-                return this.scrapeAgents(ctx, 'v1.ddns.agent.sync').then((res)=>res.filter((item) => item.status == 'fulfilled'))
+                return this.scrapeAgents(ctx, 'v1.ddns.agent.sync').then((res) => res.filter((item) => item.status == 'fulfilled'))
             }
         },
         maps: {
@@ -397,7 +468,7 @@ module.exports = {
             },
             permissions: ['domains.maps'],
             async handler(ctx) {
-                return this.scrapeAgents(ctx, 'v1.ddns.agent.maps').then((res)=>res.filter((item) => item.status == 'fulfilled'))
+                return this.scrapeAgents(ctx, 'v1.ddns.agent.maps').then((res) => res.filter((item) => item.status == 'fulfilled'))
             }
         },
         stats: {
@@ -407,7 +478,7 @@ module.exports = {
             },
             permissions: ['domains.stats'],
             async handler(ctx) {
-                return this.scrapeAgents(ctx, 'v1.ddns.agent.stats').then((res)=>res.filter((item) => item.status == 'fulfilled'))
+                return this.scrapeAgents(ctx, 'v1.ddns.agent.stats').then((res) => res.filter((item) => item.status == 'fulfilled'))
             }
         },
     },

@@ -75,7 +75,14 @@ module.exports = {
 
 			type: {
 				type: "enum",
-				values: ["A", "AAAA", "CNAME", "SOA", "MX", "NS", "TXT", "CAA", "SRV"],
+				values: [
+					"A", "AAAA", "CNAME", 
+					"SOA", "MX", "NS", 
+					"TXT", "CAA", "SRV",
+					"TLSA", "DS", "DNSKEY",
+					"NSEC", "NSEC3", "NSEC3PARAM",
+					"RRSIG"
+				],
 				immutable: true,
 				required: true,
 			},
@@ -153,6 +160,47 @@ module.exports = {
 			minimum: {
 				type: "number",
 				required: false,
+			},
+			//dnssec records
+			keyType: {
+				type: "enum",
+				values: ["KSK", "ZSK"],
+				optional: false
+			},
+			keySize: {
+				type: "enum",
+				values: [1024, 2048, 4096],
+				optional: false
+			},
+			keyTTL: { type: "number", optional: false },
+			keyFlags: {
+				type: "number",
+				default: 257,
+				optional: false
+			},
+			keyProtocol: {
+				type: "number",
+				default: 3,
+				optional: false
+			},
+			keyAlgorithm: {
+				type: "enum",
+				values: [
+					"RSAMD5",
+					"DH",
+					"DSA",
+					"ECC",
+					"RSASHA1",
+					"DSANSEC3SHA1",
+					"RSASHA1NSEC3SHA1",
+					"RSASHA256",
+					"RSASHA512",
+					"ECCGOST",
+					"ECDSAP256SHA256",
+					"ECDSAP384SHA384",
+
+				],
+				optional: false
 			},
 
 			nullified: {
