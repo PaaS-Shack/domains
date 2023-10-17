@@ -8,7 +8,7 @@ const Membership = require("membership-mixin");
 const psl = require('../lib/psl.min.js')
 
 /**
- * Addons service
+ * Domains service
  */
 module.exports = {
     name: "domains",
@@ -16,7 +16,8 @@ module.exports = {
 
     mixins: [
         DbService({
-            entityChangedEventMode: 'emit'
+            entityChangedEventMode: 'emit',
+            permissions: 'domains'
         }),
         ConfigLoader(['domains.**']),
         Membership({
@@ -38,12 +39,6 @@ module.exports = {
         rest: true,
 
         fields: {
-            id: {
-                type: "string",
-                primaryKey: true,
-                secure: true,
-                columnName: "_id"
-            },
             default: {
                 type: "boolean",
                 default: false
@@ -105,37 +100,24 @@ module.exports = {
             //domain dnssec public private keys
 
 
-
+            ...DbService.FIELDS,
             ...Membership.FIELDS,
 
-            options: { type: "object" },
-            createdAt: {
-                type: "number",
-                readonly: true,
-                onCreate: () => Date.now()
-            },
-            updatedAt: {
-                type: "number",
-                readonly: true,
-                onUpdate: () => Date.now()
-            },
-            deletedAt: {
-                type: "number",
-                readonly: true,
-                hidden: "byDefault",
-                onRemove: () => Date.now()
-            }
         },
-        defaultPopulates: ["records"],
+
+        defaultPopulates: [
+            "records",
+        ],
 
         scopes: {
-            // List the not deleted addons
-            notDeleted: { deletedAt: null },
-
+            ...DbService.SCOPE,
             ...Membership.SCOPE,
         },
 
-        defaultScopes: ["notDeleted", ...Membership.DSCOPE],
+        defaultScopes: [
+            ...DbService.DSCOPE,
+            ...Membership.DSCOPE
+        ],
 
         config: {
             "domains.domain": "example.com",
@@ -149,38 +131,7 @@ module.exports = {
      * Actions
      */
     actions: {
-        create: {
-            permissions: ['domains.create']
-        },
-        list: {
-            permissions: ['domains.list']
-        },
-        find: {
-            rest: "GET /find",
-            permissions: ['domains.find']
-        },
-        count: {
-            rest: "GET /count",
-            permissions: ['domains.count']
-        },
-        get: {
-            needEntity: true,
-            permissions: ['domains.get']
-        },
-        resolve: {
-            needEntity: true,
-            permissions: ['domains.get']
-        },
-        update: {
-            needEntity: true,
-            permissions: ['domains.update']
-        },
-        replace: false,
-        remove: {
-            needEntity: true,
-            permissions: ['domains.remove']
-        },
-
+        
         //service action to create dnssec key pair
         createKeyPair: {
             params: {
@@ -225,29 +176,28 @@ module.exports = {
                     ],
                     optional: false
                 },
-                async handler(ctx) {
-                    const params = Object.assign({}, ctx.params);
+            },
+            async handler(ctx) {
+                const params = Object.assign({}, ctx.params);
 
-                    const parsed = psl.parse(params.domain.replace('*.', '').replace('_', ''));
+                const parsed = psl.parse(params.domain.replace('*.', '').replace('_', ''));
 
-                    const domain = await this.findEntity(ctx, {
-                        query: {
-                            domain: parsed.domain
-                        }
-                    });
+                const domain = await this.findEntity(ctx, {
+                    query: {
+                        domain: parsed.domain
+                    }
+                });
 
-                    return await ctx.call('v1.dnssec.createKeyPair', {
-                        domain: domain.id,
-                        keyType: params.keyType,
-                        keySize: params.keySize,
-                        keyTTL: params.keyTTL,
-                        keyFlags: params.keyFlags,
-                        keyProtocol: params.keyProtocol,
-                        keyAlgorithm: params.keyAlgorithm,
-                    })
-                }
+                return await ctx.call('v1.dnssec.createKeyPair', {
+                    domain: domain.id,
+                    keyType: params.keyType,
+                    keySize: params.keySize,
+                    keyTTL: params.keyTTL,
+                    keyFlags: params.keyFlags,
+                    keyProtocol: params.keyProtocol,
+                    keyAlgorithm: params.keyAlgorithm,
+                })
             }
-
         },
 
         domainExists: {

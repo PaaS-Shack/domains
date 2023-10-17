@@ -13,7 +13,9 @@ module.exports = {
 	version: 1,
 
 	mixins: [
-		DbService({}),
+		DbService({
+			permissions: 'domains.records'
+		}),
 		ConfigLoader(['domains.**'])
 	],
 
@@ -31,13 +33,6 @@ module.exports = {
 		rest: "/v1/domains/:domain/records",
 
 		fields: {
-			id: {
-				type: "string",
-				primaryKey: true,
-				secure: true,
-				columnName: "_id"
-			},
-
 
 			domain: {
 				type: "string",
@@ -76,8 +71,8 @@ module.exports = {
 			type: {
 				type: "enum",
 				values: [
-					"A", "AAAA", "CNAME", 
-					"SOA", "MX", "NS", 
+					"A", "AAAA", "CNAME",
+					"SOA", "MX", "NS",
 					"TXT", "CAA", "SRV",
 					"TLSA", "DS", "DNSKEY",
 					"NSEC", "NSEC3", "NSEC3PARAM",
@@ -214,33 +209,22 @@ module.exports = {
 				required: false,
 			},
 
-
-			options: { type: "object" },
-			createdAt: {
-				type: "number",
-				readonly: true,
-				onCreate: () => Date.now()
-			},
-			updatedAt: {
-				type: "number",
-				readonly: true,
-				onUpdate: () => Date.now()
-			},
-			deletedAt: {
-				type: "number",
-				readonly: true,
-				hidden: "byDefault",
-				onRemove: () => Date.now()
-			}
+			...DbService.FIELDS,
 		},
+
+		defaultPopulates: [
+
+		],
 
 		scopes: {
 			async domain(query, ctx, params) { return this.validateHasDomainPermissions(query, ctx, params) },
-
-			notDeleted: { deletedAt: null }
+			...DbService.SCOPE,
 		},
 
-		defaultScopes: ["domain", "notDeleted"]
+		defaultScopes: [
+			"domain",
+			...DbService.DSCOPE,
+		],
 	},
 
 	/**
@@ -248,48 +232,6 @@ module.exports = {
 	 */
 
 	actions: {
-		create: {
-			permissions: ['domains.records.create']
-		},
-		list: {
-			permissions: ['domains.records.list'],
-			params: {
-				domain: { type: "string" }
-			}
-		},
-
-		find: {
-			rest: "GET /find",
-			permissions: ['domains.records.find'],
-			params: {
-				domain: { type: "string" }
-			}
-		},
-
-		count: {
-			rest: "GET /count",
-			permissions: ['domains.records.count'],
-			params: {
-				domain: { type: "string" }
-			}
-		},
-
-		get: {
-			needEntity: true,
-			permissions: ['domains.records.get']
-		},
-
-		update: {
-			needEntity: true,
-			permissions: ['domains.records.update']
-		},
-
-		replace: false,
-
-		remove: {
-			needEntity: true,
-			permissions: ['domains.records.remove']
-		},
 		syncRecords: {
 			params: {},
 			async handler(ctx) {

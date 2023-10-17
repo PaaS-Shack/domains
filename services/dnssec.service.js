@@ -135,7 +135,21 @@ module.exports = {
                 secure: true,
             },
 
-        }
+        
+			...DbService.FIELDS,
+		},
+
+		defaultPopulates: [
+
+		],
+
+		scopes: {
+			...DbService.SCOPE,
+		},
+
+		defaultScopes: [
+			...DbService.DSCOPE,
+		],
     },
 
     actions: {

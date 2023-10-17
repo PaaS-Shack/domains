@@ -27,11 +27,11 @@
   "dependencies": {
     "nats": "^2.7.1",
     "moleculer": "^0.14.26",
-    "config-mixin": "git+https://github.com/FLYBYME/config-mixin.git",
+    "config-mixin": "git+https://github.com/PaaS-Shack/config-mixin.git",
     "cron-mixin": "git+https://github.com/PaaS-Shack/cron-mixin.git",
     "db-mixin": "git+https://github.com/PaaS-Shack/db-mixin.git",
     "middlewares": "git+https://github.com/PaaS-Shack/middlewares.git",
-    "membership-mixin": "git+https://github.com/FLYBYME/membership-mixin.git"
+    "membership-mixin": "git+https://github.com/PaaS-Shack/membership-mixin.git"
   },
   "engines": {
     "node": ">= 16.x.x"
