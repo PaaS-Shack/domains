@@ -1,6 +1,7 @@
 FROM node:18-alpine
 
 ENV NODE_ENV=production
+RUN apk add --no-cache git
 
 RUN mkdir /app
 WORKDIR /app
