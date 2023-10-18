@@ -342,6 +342,7 @@ module.exports = {
 			// Adapter init
 			if (!ctx) return query;
 
+			query.domain = params.domain;
 			if (params.domain) {
 				console.log(params)
 				const res = await ctx.call("v1.domains.resolve", {
