@@ -342,33 +342,11 @@ module.exports = {
 			// Adapter init
 			if (!ctx) return query;
 
-			query.domain = params.domain;
 			if (params.domain) {
-				console.log(params)
-				const res = await ctx.call("v1.domains.resolve", {
-					id: params.domain,
-					fields: ['id']
-				});
-				if (res) {
-					query.domain = params.domain;
-					return query;
-				}
-				throw new MoleculerClientError(
-					`You have no right for the domain '${params.domain}'`,
-					403,
-					"ERR_NO_PERMISSION",
-					{ domain: params.domain }
-				);
+				query.domain = params.domain
 			}
-			if (!ctx.action) {
-				query.domain = params.domain;
-				return query;
-			}
-			if (ctx.action.params.domain && !ctx.action.params.domain.optional) {
-				throw new MoleculerClientError(`domain is required`, 422, "VALIDATION_ERROR", [
-					{ type: "required", field: "domain" }
-				]);
-			}
+
+			return query;
 		},
 
 		async validateDomain({ ctx, value, params, id, entity }) {
