@@ -160,23 +160,23 @@ module.exports = {
 			keyType: {
 				type: "enum",
 				values: ["KSK", "ZSK"],
-				optional: false
+				required: false
 			},
 			keySize: {
 				type: "enum",
 				values: [1024, 2048, 4096],
-				optional: false
+				required: false
 			},
-			keyTTL: { type: "number", optional: false },
+			keyTTL: { type: "number", required: false },
 			keyFlags: {
 				type: "number",
 				default: 257,
-				optional: false
+				required: false
 			},
 			keyProtocol: {
 				type: "number",
 				default: 3,
-				optional: false
+				required: false
 			},
 			keyAlgorithm: {
 				type: "enum",
@@ -195,7 +195,7 @@ module.exports = {
 					"ECDSAP384SHA384",
 
 				],
-				optional: false
+				required: false
 			},
 
 			nullified: {
