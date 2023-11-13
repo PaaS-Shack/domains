@@ -296,7 +296,7 @@ module.exports = {
                     }
                 });
 
-                return !domain
+                return domain == null;
             }
         },
 
