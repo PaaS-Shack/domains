@@ -269,6 +269,37 @@ module.exports = {
             }
         },
 
+        /**
+         * check is domain is available
+         * 
+         * @actions
+         * @param {String} domain - domain name
+         * 
+         * @returns {Boolean} - true if domain is available
+         */
+        isAvailable: {
+            rest:{
+                method: "GET",
+                path: "/available/:domain",
+            },
+            params: {
+                domain: { type: "string", optional: false },
+            },
+            async handler(ctx) {
+                const params = Object.assign({}, ctx.params);
+
+                const parsed = psl.parse(params.domain.replace('*.', '').replace('_', ''));
+
+                const domain = await this.findEntity(null, {
+                    query: {
+                        domain: parsed.domain
+                    }
+                });
+
+                return !domain
+            }
+        },
+
         records: {
             rest: "GET /records",
             params: {
