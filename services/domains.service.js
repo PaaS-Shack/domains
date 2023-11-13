@@ -131,7 +131,7 @@ module.exports = {
      * Actions
      */
     actions: {
-        
+
         //service action to create dnssec key pair
         createKeyPair: {
             params: {
@@ -278,7 +278,7 @@ module.exports = {
          * @returns {Boolean} - true if domain is available
          */
         isAvailable: {
-            rest:{
+            rest: {
                 method: "GET",
                 path: "/available/:domain",
             },
@@ -296,7 +296,7 @@ module.exports = {
                     }
                 });
 
-                return domain == null;
+                return !!domain;
             }
         },
 
