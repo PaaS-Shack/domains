@@ -305,7 +305,6 @@ module.exports = {
             params: {
 
             },
-            permissions: ['domains.records.get'],
             async handler(ctx) {
                 const params = Object.assign({}, ctx.params);
                 const domainName = this.config["domains.domain"];
@@ -323,7 +322,6 @@ module.exports = {
             params: {
                 record: { type: "string", optional: false },
             },
-            permissions: ['domains.records.get'],
             async handler(ctx) {
                 const params = Object.assign({}, ctx.params);
                 const domainName = this.config["domains.domain"];
@@ -346,7 +344,6 @@ module.exports = {
                     default: 'A'
                 },
             },
-            permissions: ['domains.addARecord'],
             async handler(ctx) {
                 const params = Object.assign({}, ctx.params);
 
@@ -395,7 +392,6 @@ module.exports = {
                     default: 'A'
                 },
             },
-            permissions: ['domains.addARecord'],
             async handler(ctx) {
                 const params = Object.assign({}, ctx.params);
 
@@ -437,7 +433,6 @@ module.exports = {
             params: {
                 target: { type: "string", min: 3, optional: true },
             },
-            permissions: ['domains.sync'],
             async handler(ctx) {
                 return this.scrapeAgents(ctx, 'v1.ddns.agent.sync').then((res) => res.filter((item) => item.status == 'fulfilled'))
             }
@@ -447,7 +442,6 @@ module.exports = {
             params: {
                 target: { type: "string", min: 3, optional: true },
             },
-            permissions: ['domains.maps'],
             async handler(ctx) {
                 return this.scrapeAgents(ctx, 'v1.ddns.agent.maps').then((res) => res.filter((item) => item.status == 'fulfilled'))
             }
@@ -457,7 +451,6 @@ module.exports = {
             params: {
                 target: { type: "string", min: 3, optional: true },
             },
-            permissions: ['domains.stats'],
             async handler(ctx) {
                 return this.scrapeAgents(ctx, 'v1.ddns.agent.stats').then((res) => res.filter((item) => item.status == 'fulfilled'))
             }
