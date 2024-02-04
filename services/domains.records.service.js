@@ -253,6 +253,37 @@ module.exports = {
 				});
 			}
 		},
+
+		/**
+		 * remove records by domain
+		 * 
+		 * @actions
+		 * @param {String} domain - domain id
+		 * 
+		 * @returns {Number} - number of removed records
+		 */
+		removeByDomain: {
+			params: {
+				domain: { type: "string" }
+			},
+			async handler(ctx) {
+				const domain = ctx.params.domain;
+				const entities = await this.findEntities(null, {
+					query: { domain },
+					fields: ["id"],
+					scope: false
+				});
+				await this.Promise.all(
+					entities.map(entity =>
+						this.removeEntity(ctx, { id: entity.id, scope: false })
+							.catch((err) => {
+								this.logger.error(`Error removing domain record ${entity.id}`, err)
+							})
+					)
+				);
+				return entities.length;
+			}
+		},
 	},
 
 	/**
@@ -266,21 +297,9 @@ module.exports = {
 		async "domains.removed"(ctx) {
 			const domain = ctx.params.data;
 
-			const entities = await this.findEntities(null, {
-				query: { domain: domain.id },
-				fields: ["id"],
-				scope: false
-			});
-			await this.Promise.all(
-				entities.map(entity =>
-					this.removeEntity(ctx, { id: entity.id, scope: false })
-						.catch((err) => {
-							this.logger.error(`Error removing domain record ${entity.id}`, err)
-						})
-				)
-			);
+			const entities = await this.actions.removeByDomain({ domain: domain.id });
 
-			this.logger.info(`Removed ${entities.length} records for domain ${domain.domain}`)
+			this.logger.info(`Removed ${entities} records for domain ${domain.domain}`)
 
 		},
 	},
