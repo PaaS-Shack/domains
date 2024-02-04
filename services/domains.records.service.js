@@ -265,18 +265,23 @@ module.exports = {
 		},
 		async "domains.removed"(ctx) {
 			const domain = ctx.params.data;
-			try {
-				const entities = await this.findEntities(ctx, {
-					query: { domain: domain.id },
-					fields: ["id"],
-					scope: false
-				});
-				await this.Promise.all(
-					entities.map(entity => this.removeEntity(ctx, { id: entity.id, scope: false }))
-				);
-			} catch (err) {
-				this.logger.error(`Unable to delete records of domain '${domain.id}'`, err);
-			}
+
+			const entities = await this.findEntities(null, {
+				query: { domain: domain.id },
+				fields: ["id"],
+				scope: false
+			});
+			await this.Promise.all(
+				entities.map(entity =>
+					this.removeEntity(ctx, { id: entity.id, scope: false })
+						.catch((err) => {
+							this.logger.error(`Error removing domain record ${entity.id}`, err)
+						})
+				)
+			);
+
+			this.logger.info(`Removed ${entities.length} records for domain ${domain.domain}`)
+
 		},
 	},
 
