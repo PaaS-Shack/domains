@@ -291,7 +291,7 @@ module.exports = {
 	methods: {
 		async populateDomainRecords(ctx, domain) {
 
-			const promises = []
+			const promises = [];
 
 			if (this.config["domains.autoPopulate"]) {
 				const soa = {
@@ -304,11 +304,11 @@ module.exports = {
 					retry: 900,
 					expiration: 1209600,
 					minimum: 86400
-				}
+				};
 
 				soa.data = this.config["domains.domain"];
 
-				promises.push(this.actions.create(soa, { parentCtx: ctx }))
+				promises.push(this.actions.create(soa, { parentCtx: ctx }));
 
 				if (this.config["domains.issuewild"]) {
 					promises.push(this.actions.create({
@@ -317,12 +317,13 @@ module.exports = {
 						flag: 0,
 						tag: 'issuewild',
 						data: this.config["domains.issuewild"]
-					}, { parentCtx: ctx }))
+					}, { parentCtx: ctx }));
 				}
 
 				const mainDomain = await ctx.call('v1.domains.getDomain', {
 					domain: this.config['domains.domain']
-				})
+				});
+
 				if (mainDomain) {
 					const nameservers = await this.findEntities(null, {
 						query: {
@@ -337,7 +338,25 @@ module.exports = {
 							fqdn: `${domain.domain}`,
 							type: "NS",
 							data: nameserver.data,
-						}, { parentCtx: ctx }))
+						}, { parentCtx: ctx }));
+					}
+
+					// mx records
+					const mx = await this.findEntities(null, {
+						query: {
+							domain: mainDomain.id,
+							type: 'MX'
+						}
+					});
+
+					for (let index = 0; index < mx.length; index++) {
+						const record = mx[index];
+						promises.push(this.actions.create({
+							fqdn: `${domain.domain}`,
+							type: "MX",
+							data: record.data,
+							priority: record.priority,
+						}, { parentCtx: ctx }));
 					}
 				}
 			}
